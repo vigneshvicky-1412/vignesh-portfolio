@@ -56,6 +56,33 @@ nav {
 nav ul { display:flex; gap:34px; list-style:none; }
 nav a { color:var(--muted); text-decoration:none; font-size:11px; letter-spacing:2px; text-transform:uppercase; transition:color .2s; }
 nav a:hover { color:var(--accent); }
+/* Hamburger button */
+.nav-toggle {
+  display:none; flex-direction:column; gap:5px;
+  cursor:pointer; padding:4px; z-index:300; background:none; border:none;
+}
+.nav-toggle span {
+  display:block; width:24px; height:2px;
+  background:var(--text); border-radius:2px; transition:all .3s;
+}
+.nav-toggle.open span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+.nav-toggle.open span:nth-child(2){ opacity:0; }
+.nav-toggle.open span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+
+/* Mobile full-screen drawer */
+.nav-drawer {
+  display:none; position:fixed; inset:0;
+  background:rgba(7,9,13,.97); backdrop-filter:blur(24px);
+  z-index:250; flex-direction:column;
+  align-items:center; justify-content:center; gap:32px;
+}
+.nav-drawer.open { display:flex; }
+.nav-drawer a {
+  color:var(--text); text-decoration:none;
+  font-family:'Syne',sans-serif; font-size:26px; font-weight:700;
+  letter-spacing:-1px; transition:color .2s;
+}
+.nav-drawer a:hover { color:var(--accent); }
 
 /* ── HERO ── */
 #hero {
@@ -340,21 +367,32 @@ footer p { font-size:11px; color:var(--muted); }
 
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
-  nav{padding:14px 20px;} nav ul{gap:16px;} nav a{font-size:10px;}
-  section:not(#hero){padding:70px 20px;}
-  .hero-content{flex-direction:column;align-items:center;text-align:center;padding:0 20px;gap:36px;}
-  .hero-text{display:flex;flex-direction:column;align-items:center;}
-  .hero-tag{justify-content:center;}
-  .hero-quote{text-align:left;}
-  .hero-cta{justify-content:center;}
-  #about .about-wrap{grid-template-columns:1fr;gap:40px;}
-  #skills .skills-grid{grid-template-columns:1fr 1fr;}
-  #projects .proj-grid{grid-template-columns:1fr;}
-  #certifications .cert-grid{grid-template-columns:1fr;}
-  #education .edu-card{grid-template-columns:1fr;}
-  .cgpa-box{text-align:left;}
-  #contact .contact-grid{grid-template-columns:1fr;gap:40px;}
-  footer{flex-direction:column;gap:8px;text-align:center;}
+  nav{ padding:14px 20px; }
+  nav ul{ display:none; }
+  .nav-toggle{ display:flex; }
+  .cursor,.cursor-ring{ display:none; }
+  section:not(#hero){ padding:70px 20px; }
+  .hero-content{ flex-direction:column; align-items:center; text-align:center; padding:80px 20px 0; gap:28px; }
+  .hero-text{ display:flex; flex-direction:column; align-items:center; }
+  .hero-tag{ justify-content:center; }
+  .hero-quote{ text-align:left; }
+  .hero-cta{ flex-direction:column; width:100%; gap:10px; }
+  .btn{ justify-content:center; width:100%; text-align:center; }
+  .hero-photo-ring{ width:180px; height:180px; }
+  .hero-photo-ring img{ width:168px; height:168px; border-radius:50%; object-fit:cover; }
+  #about .about-wrap{ grid-template-columns:1fr; gap:40px; }
+  #skills .skills-grid{ grid-template-columns:1fr 1fr; }
+  #projects .proj-grid{ grid-template-columns:1fr; }
+  #certifications .cert-grid{ grid-template-columns:1fr; }
+  #education .edu-card{ grid-template-columns:1fr; }
+  .cgpa-box{ text-align:left; }
+  #contact .contact-grid{ grid-template-columns:1fr; gap:40px; }
+  footer{ flex-direction:column; gap:8px; text-align:center; }
+  .section-title{ margin-bottom:36px; }
+}
+@media(max-width:480px){
+  #skills .skills-grid{ grid-template-columns:1fr; }
+  .hero-name{ font-size:52px !important; }
 }
 </style>
 </head>
@@ -376,8 +414,21 @@ footer p { font-size:11px; color:var(--muted); }
     <li><a href="#education">Education</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
+  <button class="nav-toggle" id="navToggle" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
 
+<!-- Mobile drawer -->
+<div class="nav-drawer" id="navDrawer">
+  <a href="#about"          onclick="closeDrawer()">About</a>
+  <a href="#skills"         onclick="closeDrawer()">Skills</a>
+  <a href="#experience"     onclick="closeDrawer()">Experience</a>
+  <a href="#projects"       onclick="closeDrawer()">Projects</a>
+  <a href="#certifications" onclick="closeDrawer()">Certifications</a>
+  <a href="#education"      onclick="closeDrawer()">Education</a>
+  <a href="#contact"        onclick="closeDrawer()">Contact</a>
+</div>
 <!-- HERO -->
 <section id="hero">
   <video class="hero-video" autoplay muted loop playsinline>
@@ -389,7 +440,7 @@ footer p { font-size:11px; color:var(--muted); }
     <!-- Photo -->
     <div class="hero-photo-wrap">
       <div class="hero-photo-ring">
-        <img src="your-photo.jpeg" style="width:208px;height:208px;border-radius:50%;object-fit:cover;" />
+        <img src="your-phot.jpeg" style="width:208px;height:208px;border-radius:50%;object-fit:cover;" />
       </div>
     </div>
 
@@ -646,23 +697,23 @@ footer p { font-size:11px; color:var(--muted); }
       <p style="margin-top:16px;">Whether you want to talk data, discuss opportunities or just say hi — my inbox is open. Reach out through any of the channels below.</p>
     </div>
     <div class="contact-cards">
-      <a href="tel:+919003570136" class="contact-card">
+      <a href="tel:+9190035" class="contact-card">
         <div class="contact-icon">📞</div>
         <div>
           <div class="contact-label">Mobile</div>
-          <div class="contact-val">+91 90035 70136</div>
+          <div class="contact-val">+91 90035 </div>
         </div>
         <div class="contact-arrow">→</div>
       </a>
-      <a href="mailto:vigneshe1412@gmail.com" class="contact-card">
+      <a href="mailto:vigneshe@gmail.com" class="contact-card">
         <div class="contact-icon">✉️</div>
         <div>
           <div class="contact-label">Email</div>
-          <div class="contact-val">vigneshe1412@gmail.com</div>
+          <div class="contact-val">vigneshe@gmail.com</div>
         </div>
         <div class="contact-arrow">→</div>
       </a>
-      <a href="https://www.linkedin.com/in/vignesh-e-data-analyst" target="_blank" class="contact-card">
+      <a href="https://www.linkedin.com/in/vignesh-e-data-" target="_blank" class="contact-card">
         <div class="contact-icon">💼</div>
         <div>
           <div class="contact-label">LinkedIn</div>
@@ -682,6 +733,11 @@ footer p { font-size:11px; color:var(--muted); }
 
 <script>
 // Cursor
+// Hamburger menu
+const navToggle = document.getElementById('navToggle');
+const navDrawer = document.getElementById('navDrawer');
+function closeDrawer(){ navToggle.classList.remove('open'); navDrawer.classList.remove('open'); }
+navToggle.addEventListener('click',()=>{ navToggle.classList.toggle('open'); navDrawer.classList.toggle('open'); });
 const cursor = document.getElementById('cursor');
 const ring   = document.getElementById('cursorRing');
 let mx=0,my=0,rx=0,ry=0;
